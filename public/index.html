@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASTRO3 - Tu Guía Cósmica</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0a1a">
+  <meta name="description" content="Horóscopo 3-en-1: Occidental + Chino + Védico. Descubre qué hacer hoy.">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔮 ASTRO3</h1>
+      <p class="tagline">Tu Guía Cósmica Personal</p>
+    </header>
+    
+    <main class="onboarding">
+      <div class="card">
+        <h2>Descubre tu destino</h2>
+        <p>Combinamos 3 tradiciones ancestrales para decirte <strong>qué hacer hoy</strong>.</p>
+        
+        <form id="onboarding-form">
+          <div class="form-group">
+            <label for="nombre">Tu nombre</label>
+            <input type="text" id="nombre" placeholder="¿Cómo te llamas?" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="fecha">Fecha de nacimiento</label>
+            <input type="date" id="fecha" required>
+          </div>
+          
+          <button type="submit" class="btn-primary">
+            ✨ Revelar mi destino
+          </button>
+        </form>
+      </div>
+      
+      <div class="traditions">
+        <div class="tradition">
+          <span class="icon">☀️</span>
+          <span>Occidental</span>
+        </div>
+        <div class="tradition">
+          <span class="icon">🐉</span>
+          <span>Chino</span>
+        </div>
+        <div class="tradition">
+          <span class="icon">🕉️</span>
+          <span>Védico</span>
+        </div>
+        <div class="tradition">
+          <span class="icon">👼</span>
+          <span>Arcángel</span>
+        </div>
+      </div>
+    </main>
+    
+    <footer>
+      <p>🐝 Hecho por Colmena - 24/12/2025</p>
+    </footer>
+  </div>
+  
+  <script>
+    document.getElementById('onboarding-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const nombre = document.getElementById('nombre').value;
+      const fecha = document.getElementById('fecha').value;
+      localStorage.setItem('astro3_nombre', nombre);
+      localStorage.setItem('astro3_fecha', fecha);
+      window.location.href = 'app.html';
+    });
+  </script>
+</body>
+</html>

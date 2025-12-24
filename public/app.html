@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASTRO3 - Tu Día</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0a1a">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔮 ASTRO3</h1>
+    </header>
+    
+    <main class="dashboard">
+      <div class="greeting">
+        <h2>Hola, <span id="user-name">...</span></h2>
+        <p class="date" id="today-date">...</p>
+      </div>
+      
+      <section class="energy-section">
+        <h3 class="section-title">Tu Energía Hoy</h3>
+        <div class="energy-item">
+          <span class="icon">☀️</span>
+          <div>
+            <div class="label">Occidental</div>
+            <div class="value" id="western-sign">...</div>
+          </div>
+        </div>
+        <div class="energy-item">
+          <span class="icon">🐉</span>
+          <div>
+            <div class="label">Chino</div>
+            <div class="value" id="chinese-sign">...</div>
+          </div>
+        </div>
+        <div class="energy-item">
+          <span class="icon">🕉️</span>
+          <div>
+            <div class="label">Védico</div>
+            <div class="value" id="vedic-sign">...</div>
+          </div>
+        </div>
+        <div class="energy-item">
+          <span class="icon">👼</span>
+          <div>
+            <div class="label">Arcángel Guardián</div>
+            <div class="value" id="archangel">...</div>
+          </div>
+        </div>
+      </section>
+      
+      <section class="actions-section">
+        <h3 class="section-title">✅ Haz Esto Hoy</h3>
+        <div class="action-item">
+          <span class="action-number">1</span>
+          <span id="action-1">...</span>
+        </div>
+        <div class="action-item">
+          <span class="action-number">2</span>
+          <span id="action-2">...</span>
+        </div>
+        <div class="action-item">
+          <span class="action-number">3</span>
+          <span id="action-3">...</span>
+        </div>
+      </section>
+      
+      <section class="warning-section">
+        <h3 class="section-title">⚠️ Evita Hoy</h3>
+        <div class="warning-content">
+          <span class="warning-icon">⚠️</span>
+          <span id="warning-text">...</span>
+        </div>
+      </section>
+      
+      <section class="extras-section">
+        <div class="extras-grid">
+          <div class="extra-item">
+            <span class="icon">🎨</span>
+            <div class="label">Color</div>
+            <div class="value" id="lucky-color">...</div>
+          </div>
+          <div class="extra-item">
+            <span class="icon">🔢</span>
+            <div class="label">Número</div>
+            <div class="value" id="lucky-number">...</div>
+          </div>
+          <div class="extra-item">
+            <span class="icon">⏰</span>
+            <div class="label">Hora de Poder</div>
+            <div class="value" id="power-hour">...</div>
+          </div>
+        </div>
+      </section>
+      
+      <div class="cta-premium">
+        <h3>💎 Consulta Especial</h3>
+        <p>¿Dudas sobre amor, carrera o dinero?</p>
+        <button class="btn-premium">Preguntar - $0.99</button>
+      </div>
+    </main>
+    
+    <footer>
+      <p>🐝 Hecho por Colmena - 24/12/2025</p>
+    </footer>
+  </div>
+  
+  <script src="js/astro-calc.js"></script>
+  <script src="js/actions-engine.js"></script>
+  <script>
+    // Check if user has data
+    const nombre = localStorage.getItem('astro3_nombre');
+    const fechaStr = localStorage.getItem('astro3_fecha');
+    
+    if (!nombre || !fechaStr) {
+      window.location.href = 'index.html';
+    }
+    
+    // Display user name
+    document.getElementById('user-name').textContent = nombre;
+    
+    // Display today's date
+    const today = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('today-date').textContent = today.toLocaleDateString('es-MX', options);
+    
+    // Calculate all signs
+    const birthDate = new Date(fechaStr);
+    const western = getWesternSign(birthDate);
+    const chinese = getChineseZodiac(birthDate.getFullYear());
+    const vedic = getNakshatra(birthDate);
+    const archangel = getArchangel(birthDate);
+    
+    // Display signs
+    document.getElementById('western-sign').textContent = `${western.name} (${western.element})`;
+    document.getElementById('chinese-sign').textContent = `${chinese.animal} de ${chinese.element}`;
+    document.getElementById('vedic-sign').textContent = vedic.nakshatra;
+    document.getElementById('archangel').textContent = `${archangel.name} - ${archangel.domain}`;
+    
+    // Generate and display actions
+    const result = generateActions(western, chinese, archangel);
+    document.getElementById('action-1').textContent = result.actions[0];
+    document.getElementById('action-2').textContent = result.actions[1];
+    document.getElementById('action-3').textContent = result.actions[2];
+    document.getElementById('warning-text').textContent = result.warning;
+    document.getElementById('lucky-color').textContent = result.color;
+    document.getElementById('lucky-number').textContent = result.number;
+    document.getElementById('power-hour').textContent = result.hour;
+  </script>
+</body>
+</html>
