@@ -93,3 +93,77 @@ function getArchangel(birthDate) {
   
   return archangels[sum];
 }
+
+// NUMEROLOGIA - Nuevo para ASTRO4
+function getNumerology(birthDate, fullName) {
+  // Numero de Vida (suma fecha nacimiento)
+  const dateStr = birthDate.toISOString().split('T')[0].replace(/-/g, '');
+  let lifeNumber = dateStr.split('').reduce((a, b) => a + parseInt(b), 0);
+  while (lifeNumber > 9 && lifeNumber !== 11 && lifeNumber !== 22 && lifeNumber !== 33) {
+    lifeNumber = lifeNumber.toString().split('').reduce((a, b) => a + parseInt(b), 0);
+  }
+  
+  // Tabla Pitagorica
+  const letterValues = {
+    a:1, b:2, c:3, d:4, e:5, f:6, g:7, h:8, i:9,
+    j:1, k:2, l:3, m:4, n:5, o:6, p:7, q:8, r:9,
+    s:1, t:2, u:3, v:4, w:5, x:6, y:7, z:8
+  };
+  
+  const vowels = ['a','e','i','o','u'];
+  const nameLower = (fullName || '').toLowerCase().replace(/[^a-z]/g, '');
+  
+  // Numero del Alma (solo vocales)
+  let soulSum = 0;
+  for (const char of nameLower) {
+    if (vowels.includes(char)) {
+      soulSum += letterValues[char] || 0;
+    }
+  }
+  while (soulSum > 9 && soulSum !== 11 && soulSum !== 22) {
+    soulSum = soulSum.toString().split('').reduce((a, b) => a + parseInt(b), 0);
+  }
+  
+  // Numero de Destino (todas las letras)
+  let destinySum = 0;
+  for (const char of nameLower) {
+    destinySum += letterValues[char] || 0;
+  }
+  while (destinySum > 9 && destinySum !== 11 && destinySum !== 22) {
+    destinySum = destinySum.toString().split('').reduce((a, b) => a + parseInt(b), 0);
+  }
+  
+  // Numero Personal del Dia
+  const today = new Date();
+  const daySum = today.getDate() + (today.getMonth() + 1) + lifeNumber;
+  let personalDay = daySum;
+  while (personalDay > 9) {
+    personalDay = personalDay.toString().split('').reduce((a, b) => a + parseInt(b), 0);
+  }
+  
+  const meanings = {
+    1: { keyword: 'Liderazgo', desc: 'Independencia, iniciativa, originalidad' },
+    2: { keyword: 'Cooperación', desc: 'Diplomacia, equilibrio, sensibilidad' },
+    3: { keyword: 'Expresión', desc: 'Creatividad, comunicación, alegría' },
+    4: { keyword: 'Estabilidad', desc: 'Trabajo, orden, construcción' },
+    5: { keyword: 'Libertad', desc: 'Cambio, aventura, versatilidad' },
+    6: { keyword: 'Responsabilidad', desc: 'Amor, hogar, servicio' },
+    7: { keyword: 'Sabiduría', desc: 'Análisis, espiritualidad, introspección' },
+    8: { keyword: 'Poder', desc: 'Abundancia, éxito material, autoridad' },
+    9: { keyword: 'Humanitarismo', desc: 'Compasión, culminación, universalidad' },
+    11: { keyword: 'Maestro Espiritual', desc: 'Intuición elevada, inspiración' },
+    22: { keyword: 'Maestro Constructor', desc: 'Grandes logros, visión práctica' },
+    33: { keyword: 'Maestro Sanador', desc: 'Servicio elevado, amor incondicional' }
+  };
+  
+  return {
+    lifeNumber: lifeNumber,
+    lifeMeaning: meanings[lifeNumber] || meanings[9],
+    soulNumber: soulSum,
+    soulMeaning: meanings[soulSum] || meanings[9],
+    destinyNumber: destinySum,
+    destinyMeaning: meanings[destinySum] || meanings[9],
+    personalDay: personalDay,
+    personalDayMeaning: meanings[personalDay] || meanings[9]
+  };
+}

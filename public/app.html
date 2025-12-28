@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ASTRO3 - Tu Día</title>
+  <title>ASTRO4 - Tu Día</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0a0a1a">
@@ -11,7 +11,7 @@
 <body>
   <div class="container">
     <header>
-      <h1>🔮 ASTRO3</h1>
+      <h1>🔮 ASTRO4</h1>
     </header>
     
     <main class="dashboard">
@@ -44,10 +44,10 @@
           </div>
         </div>
         <div class="energy-item">
-          <span class="icon">👼</span>
+          <span class="icon">🔢</span>
           <div>
-            <div class="label">Arcángel Guardián</div>
-            <div class="value" id="archangel">...</div>
+            <div class="label">Numerología</div>
+            <div class="value" id="numerology">...</div>
           </div>
         </div>
       </section>
@@ -136,16 +136,16 @@
     const western = getWesternSign(birthDate);
     const chinese = getChineseZodiac(birthDate.getFullYear());
     const vedic = getNakshatra(birthDate);
-    const archangel = getArchangel(birthDate);
+    const numerology = getNumerology(birthDate, nombre);
     
     // Display signs
     document.getElementById('western-sign').textContent = `${western.name} (${western.element})`;
     document.getElementById('chinese-sign').textContent = `${chinese.animal} de ${chinese.element}`;
     document.getElementById('vedic-sign').textContent = vedic.nakshatra;
-    document.getElementById('archangel').textContent = `${archangel.name} - ${archangel.domain}`;
+    document.getElementById('numerology').textContent = `${numerology.lifeNumber} - ${numerology.lifeMeaning.keyword}`;
     
     // Generate and display actions
-    const result = generateActions(western, chinese, archangel, birthDate);
+    const result = generateActions(western, chinese, numerology, birthDate);
     document.getElementById('action-1').textContent = result.actions[0];
     document.getElementById('action-2').textContent = result.actions[1];
     document.getElementById('action-3').textContent = result.actions[2];
@@ -156,11 +156,11 @@
     
     // Share function
     function shareResults() {
-      const text = `🔮 Mi energía hoy según ASTRO3:
+      const text = `🔮 Mi energía hoy según ASTRO4:
 
 ☀️ ${western.name} (${western.element})
 🐉 ${chinese.animal} de ${chinese.element}
-👼 Arcángel ${archangel.name}
+🔢 Arcángel ${numerology.lifeNumber}
 
 ✅ Mis acciones de hoy:
 1. ${result.actions[0]}
@@ -172,7 +172,7 @@
 Descubre tu guía cósmica: https://astro3-lovat.vercel.app`;
 
       if (navigator.share) {
-        navigator.share({ title: 'Mi energía ASTRO3', text: text });
+        navigator.share({ title: 'Mi energía ASTRO4', text: text });
       } else {
         navigator.clipboard.writeText(text).then(() => {
           alert('¡Copiado! Pégalo en WhatsApp o donde quieras.');
