@@ -161,21 +161,24 @@ async function verifyPaymentSession(sessionId) {
 }
 
 // Check URL for session_id on page load
-function checkPaymentReturn() {
+async function checkPaymentReturn() {
   const params = new URLSearchParams(window.location.search);
   const sessionId = params.get('session_id');
   const payment = params.get('payment');
 
   if (sessionId && sessionId.startsWith('cs_')) {
-    // Clean URL without reloading
-    params.delete('session_id');
-    params.delete('payment');
-    params.delete('product');
-    const cleanUrl = window.location.pathname + '?' + params.toString();
-    window.history.replaceState({}, '', cleanUrl);
+    // Verify FIRST, clean URL AFTER — so user can retry on failure
+    const success = await verifyPaymentSession(sessionId);
 
-    // Verify the session
-    verifyPaymentSession(sessionId);
+    if (success) {
+      // Payment verified — clean URL
+      params.delete('session_id');
+      params.delete('payment');
+      params.delete('product');
+      const cleanUrl = window.location.pathname + '?' + params.toString();
+      window.history.replaceState({}, '', cleanUrl);
+    }
+    // If failed, session_id stays in URL so reload retries
   } else if (payment === 'cancelled') {
     params.delete('payment');
     params.delete('product');
