@@ -1011,27 +1011,27 @@
     <div class="upgrade-content">
       <button class="upgrade-close" onclick="hideUpgradeModal()">&times;</button>
       <div id="donationStep1">
-        <h2>✨ <span id="limitTitle">Límite alcanzado</span></h2>
-        <p style="color:#aaa;margin-bottom:24px;" id="limitDesc">Has disfrutado 5 consultas gratis. Para continuar, considera hacer una donación.</p>
+        <h2>✨ <span id="limitTitle" data-i18n="limitTitle">Límite alcanzado</span></h2>
+        <p style="color:#aaa;margin-bottom:24px;" id="limitDesc" data-i18n="limitDesc">Has disfrutado 5 consultas gratis. Para continuar, considera hacer una donación.</p>
         
         <a href="https://ko-fi.com/duendesapp" target="_blank" rel="noopener noreferrer" 
-           class="pricing-btn" style="display:block;text-align:center;margin-bottom:12px;text-decoration:none;">
+           class="pricing-btn" style="display:block;text-align:center;margin-bottom:12px;text-decoration:none;" data-i18n="donateBtn">
           Donar ☕
         </a>
-        <button class="pricing-btn" style="background:transparent;border:1px solid var(--accent);color:var(--accent);" onclick="showCodeInput()">
+        <button class="pricing-btn" style="background:transparent;border:1px solid var(--accent);color:var(--accent);" onclick="showCodeInput()" data-i18n="haveCodeBtn">
           Tengo código 🎁
         </button>
-        <button onclick="hideUpgradeModal()" style="display:block;width:100%;margin-top:12px;background:transparent;border:none;color:#888;cursor:pointer;">
+        <button onclick="hideUpgradeModal()" style="display:block;width:100%;margin-top:12px;background:transparent;border:none;color:#888;cursor:pointer;" data-i18n="maybeLaterBtn">
           Quizá luego
         </button>
       </div>
       <div id="donationStep2" style="display:none;">
-        <h2>🎁 <span id="codeTitle">Ingresa tu código</span></h2>
-        <input type="text" id="donationCodeInput" placeholder="Ej: ASTRO-ENERO" 
+        <h2>🎁 <span id="codeTitle" data-i18n="codeTitle">Ingresa tu código</span></h2>
+        <input type="text" id="donationCodeInput" data-i18n-placeholder="codePlaceholder" placeholder="Ej: ASTRO-FEBRERO" 
                style="width:100%;padding:12px;margin:16px 0;border-radius:8px;border:1px solid var(--accent);background:var(--bg-card);color:var(--text);text-align:center;text-transform:uppercase;font-size:16px;">
-        <p id="codeError" style="color:#ff6b6b;display:none;margin-bottom:12px;">Código inválido</p>
-        <button class="pricing-btn" onclick="submitDonationCode()">Verificar</button>
-        <button onclick="showStep1()" style="display:block;width:100%;margin-top:12px;background:transparent;border:none;color:#888;cursor:pointer;">
+        <p id="codeError" style="color:#ff6b6b;display:none;margin-bottom:12px;" data-i18n="codeError">Código inválido. Intenta de nuevo.</p>
+        <button class="pricing-btn" onclick="submitDonationCode()" data-i18n="verifyBtn">Verificar</button>
+        <button onclick="showStep1()" style="display:block;width:100%;margin-top:12px;background:transparent;border:none;color:#888;cursor:pointer;" data-i18n="backBtn">
           ← Volver
         </button>
       </div>
@@ -1061,6 +1061,7 @@
         feedbackLabel: "¿Te fue útil esta respuesta?", feedbackThanks: "¡Gracias por tu feedback!",
         compatTitle: "💕 Compatibilidad de Pareja", compatSub: "Descubre tu conexión cósmica", partnerBirth: "Fecha de nacimiento de tu pareja", compatBtn: "💕 Calcular Compatibilidad", compatLabel: "Compatibilidad Total", compatHigh: "Excelente", compatMed: "Buena", compatLow: "Desafiante", selectDate: "Selecciona una fecha",
         privacyMsg: "ASTRO4 respeta tu privacidad. Tus datos se guardan solo en tu dispositivo.",
+        limitTitle: "Límite alcanzado", limitDesc: "Has disfrutado 5 consultas gratis. Para continuar, considera hacer una donación.", donateBtn: "Donar ☕", haveCodeBtn: "Tengo código 🎁", maybeLaterBtn: "Quizá luego", codeTitle: "Ingresa tu código", codePlaceholder: "Ej: ASTRO-FEBRERO", codeError: "Código inválido. Intenta de nuevo.", verifyBtn: "Verificar", backBtn: "← Volver",
         guideTitle: "🔮 Tu Guía:", errorMsg: "❌ Error. Intenta de nuevo.",
         askFirst: "Escribe una pregunta primero", copied: "¡Copiado!",
         life: "Vida", of: "de", personalDay: "Día Personal",
@@ -1083,6 +1084,7 @@
         feedbackLabel: "Was this response helpful?", feedbackThanks: "Thanks for your feedback!",
         compatTitle: "💕 Partner Compatibility", compatSub: "Discover your cosmic connection", partnerBirth: "Your partner's birth date", compatBtn: "💕 Calculate Compatibility", compatLabel: "Total Compatibility", compatHigh: "Excellent", compatMed: "Good", compatLow: "Challenging", selectDate: "Select a date",
         privacyMsg: "ASTRO4 respects your privacy. Your data is stored only on your device.",
+        limitTitle: "Limit reached", limitDesc: "You have enjoyed 5 free consultations. To continue, consider making a donation.", donateBtn: "Donate ☕", haveCodeBtn: "I have a code 🎁", maybeLaterBtn: "Maybe later", codeTitle: "Enter your code", codePlaceholder: "E.g.: ASTRO-FEBRUARY", codeError: "Invalid code. Please try again.", verifyBtn: "Verify", backBtn: "← Back",
         guideTitle: "🔮 Your Guide:", errorMsg: "❌ Error. Try again.",
         askFirst: "Write a question first", copied: "Copied!",
         life: "Life", of: "of", personalDay: "Personal Day",
@@ -1301,12 +1303,16 @@
       document.getElementById('donationStep1').style.display = 'block';
       document.getElementById('donationStep2').style.display = 'none';
       // Update text based on language
-      if (currentLang === 'en') {
-        document.getElementById('limitTitle').textContent = 'Limit reached';
-        document.getElementById('limitDesc').textContent = 'You have enjoyed 5 free consultations. To continue, consider making a donation.';
-        document.getElementById('codeTitle').textContent = 'Enter your code';
-        document.getElementById('codeError').textContent = 'Invalid code. Please try again.';
-      }
+      var t = i18n[currentLang];
+      document.getElementById('limitTitle').textContent = t.limitTitle;
+      document.getElementById('limitDesc').textContent = t.limitDesc;
+      document.getElementById('codeTitle').textContent = t.codeTitle;
+      document.getElementById('codeError').textContent = t.codeError;
+      document.getElementById('donationCodeInput').placeholder = t.codePlaceholder;
+      document.querySelectorAll('#upgradeModal [data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        if (t[key]) el.textContent = t[key];
+      });
     }
     
     function hideUpgradeModal() {
