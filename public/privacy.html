@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+  <title>ASTRO4 - Privacidad / Privacy</title>
+  <meta name="robots" content="noindex">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Nunito:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+  <meta name="theme-color" content="#667eea">
+  <style>
+    :root {
+      --bg-primary: #faf7f2;
+      --bg-secondary: #f5ede3;
+      --bg-card: #ffffff;
+      --text-primary: #3d3527;
+      --text-secondary: #8b7d6b;
+      --text-title: #5c4d3c;
+      --accent: #c9a96e;
+      --accent-dark: #8b7355;
+      --border: #e5ddd3;
+    }
+    [data-theme="dark"] {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --bg-card: rgba(20, 20, 30, 0.95);
+      --text-primary: #e8e6e3;
+      --text-secondary: #a0a0a0;
+      --text-title: #f0ede8;
+      --accent: #d4b896;
+      --accent-dark: #8b7355;
+      --border: #2a2a3a;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      transition: background 0.3s, color 0.3s;
+    }
+    .container { max-width: 420px; margin: 0 auto; padding: 16px; }
+    header {
+      display: flex; align-items: center; justify-content: center;
+      padding: 12px 0; position: relative;
+    }
+    .back-btn {
+      position: absolute; left: 0; color: var(--accent-dark);
+      text-decoration: none; font-size: 1.2rem; padding: 8px;
+    }
+    header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; color: var(--text-title); letter-spacing: 2px;
+    }
+    .lang-toggle {
+      position: absolute; right: 0; display: flex; gap: 2px;
+      background: rgba(255,255,255,0.8); border-radius: 16px; padding: 3px;
+    }
+    [data-theme="dark"] .lang-toggle {
+      background: rgba(20, 20, 30, 0.7); border: 1px solid var(--border);
+    }
+    .lang-btn {
+      padding: 4px 10px; border: none; border-radius: 12px;
+      font-size: 0.7rem; font-weight: 600; cursor: pointer;
+      background: transparent; color: var(--text-secondary);
+    }
+    .lang-btn.active { background: var(--accent); color: white; }
+    [data-theme="dark"] .lang-btn.active { color: #0a0a0f; }
+    .card {
+      background: var(--bg-card); border-radius: 20px;
+      padding: 24px 20px; margin-bottom: 16px;
+      box-shadow: 0 4px 20px rgba(93,77,60,0.08);
+    }
+    [data-theme="dark"] .card {
+      backdrop-filter: blur(10px); border: 1px solid var(--border);
+    }
+    .card h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; color: var(--text-title); margin-bottom: 16px;
+    }
+    .card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; color: var(--text-title); margin: 16px 0 8px;
+    }
+    .card p, .card li {
+      font-size: 0.88rem; color: var(--text-secondary);
+      line-height: 1.6; margin-bottom: 10px;
+    }
+    .card ul { padding-left: 20px; margin-bottom: 12px; }
+    .card li { margin-bottom: 6px; }
+    .highlight {
+      background: linear-gradient(135deg, rgba(201,169,110,0.1), rgba(139,115,85,0.1));
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px; border-radius: 0 12px 12px 0;
+      margin: 12px 0;
+    }
+    .highlight p { margin-bottom: 0; }
+    .updated {
+      text-align: center; font-size: 0.75rem;
+      color: var(--text-secondary); margin-top: 8px;
+    }
+    footer {
+      text-align: center; padding: 16px;
+      color: var(--text-secondary); font-size: 0.8rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    .theme-toggle {
+      position: fixed; bottom: 20px; right: 20px;
+      width: 50px; height: 50px; border-radius: 50%;
+      background: var(--accent); border: none; cursor: pointer;
+      font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      z-index: 100; display: flex; align-items: center; justify-content: center;
+    }
+    [data-theme="dark"] .theme-toggle {
+      background: var(--bg-card); border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="index.html" class="back-btn">←</a>
+      <h1>✧ ASTRO4 ✧</h1>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('es')" id="btn-es">🇲🇽 ES</button>
+        <button class="lang-btn" onclick="setLang('en')" id="btn-en">🇺🇸 EN</button>
+      </div>
+    </header>
+
+    <!-- ESPAÑOL -->
+    <div id="privacy-es">
+      <div class="card">
+        <h2>🔒 Política de Privacidad</h2>
+
+        <div class="highlight">
+          <p><strong>En resumen:</strong> ASTRO4 no recopila, almacena ni comparte tus datos personales. Todo se procesa en tu dispositivo.</p>
+        </div>
+
+        <h3>¿Qué datos proporcionas?</h3>
+        <p>Para generar tu perfil cósmico, ASTRO4 te pide:</p>
+        <ul>
+          <li>Tu nombre (solo para personalizar la experiencia)</li>
+          <li>Fecha de nacimiento (para calcular tus signos)</li>
+          <li>Hora de nacimiento (opcional, para mayor precisión)</li>
+          <li>Género (opcional, para personalizar las respuestas)</li>
+        </ul>
+
+        <h3>¿Dónde se guardan?</h3>
+        <p>Todos tus datos se almacenan <strong>exclusivamente en tu dispositivo</strong> (localStorage e IndexedDB del navegador). ASTRO4 no tiene base de datos, no tiene cuentas de usuario y no guarda nada en servidores.</p>
+
+        <h3>¿Qué pasa con las consultas al guía cósmico?</h3>
+        <p>Cuando haces una consulta, tu pregunta y tu perfil astrológico se envían a la API de Anthropic (Claude) para generar la respuesta. Esta información:</p>
+        <ul>
+          <li>No se almacena en nuestros servidores</li>
+          <li>Se procesa en tiempo real y se descarta</li>
+          <li>Anthropic tiene su propia <a href="https://www.anthropic.com/privacy" target="_blank" style="color:var(--accent)">política de privacidad</a></li>
+        </ul>
+
+        <h3>Cookies y rastreo</h3>
+        <p>ASTRO4 no usa cookies de rastreo. Utilizamos <strong>Plausible Analytics</strong>, que es una herramienta de analítica respetuosa con la privacidad que no usa cookies, no rastrea usuarios individuales y cumple con GDPR.</p>
+
+        <h3>Pagos</h3>
+        <p>Los pagos se procesan a través de <strong>Stripe</strong>. ASTRO4 nunca ve ni almacena tus datos de tarjeta de crédito. Toda la información financiera es manejada directamente por Stripe bajo sus estándares de seguridad PCI-DSS.</p>
+
+        <h3>Tus derechos</h3>
+        <p>Como todos tus datos están en tu dispositivo, tienes control total. Para eliminar todo, simplemente borra los datos del sitio en la configuración de tu navegador.</p>
+
+        <h3>Contacto</h3>
+        <p>¿Preguntas sobre privacidad? Escríbenos a <a href="mailto:hola@duendes.app" style="color:var(--accent)">hola@duendes.app</a></p>
+      </div>
+      <p class="updated">Última actualización: 25 de febrero de 2026</p>
+    </div>
+
+    <!-- ENGLISH -->
+    <div id="privacy-en" style="display:none;">
+      <div class="card">
+        <h2>🔒 Privacy Policy</h2>
+
+        <div class="highlight">
+          <p><strong>In short:</strong> ASTRO4 does not collect, store, or share your personal data. Everything is processed on your device.</p>
+        </div>
+
+        <h3>What data do you provide?</h3>
+        <p>To generate your cosmic profile, ASTRO4 asks for:</p>
+        <ul>
+          <li>Your name (only to personalize the experience)</li>
+          <li>Date of birth (to calculate your signs)</li>
+          <li>Time of birth (optional, for greater accuracy)</li>
+          <li>Gender (optional, to personalize responses)</li>
+        </ul>
+
+        <h3>Where is it stored?</h3>
+        <p>All your data is stored <strong>exclusively on your device</strong> (browser localStorage and IndexedDB). ASTRO4 has no database, no user accounts, and stores nothing on servers.</p>
+
+        <h3>What about cosmic guide consultations?</h3>
+        <p>When you make a consultation, your question and astrological profile are sent to the Anthropic (Claude) API to generate the response. This information:</p>
+        <ul>
+          <li>Is not stored on our servers</li>
+          <li>Is processed in real-time and discarded</li>
+          <li>Anthropic has its own <a href="https://www.anthropic.com/privacy" target="_blank" style="color:var(--accent)">privacy policy</a></li>
+        </ul>
+
+        <h3>Cookies & tracking</h3>
+        <p>ASTRO4 does not use tracking cookies. We use <strong>Plausible Analytics</strong>, a privacy-friendly analytics tool that uses no cookies, doesn't track individual users, and is GDPR compliant.</p>
+
+        <h3>Payments</h3>
+        <p>Payments are processed through <strong>Stripe</strong>. ASTRO4 never sees or stores your credit card information. All financial data is handled directly by Stripe under their PCI-DSS security standards.</p>
+
+        <h3>Your rights</h3>
+        <p>Since all your data lives on your device, you have full control. To delete everything, simply clear the site data in your browser settings.</p>
+
+        <h3>Contact</h3>
+        <p>Questions about privacy? Write to <a href="mailto:hola@duendes.app" style="color:var(--accent)">hola@duendes.app</a></p>
+      </div>
+      <p class="updated">Last updated: February 25, 2026</p>
+    </div>
+
+    <footer>
+      <p>Made with ♥ by <a href="https://duendes.app">Duendes</a></p>
+    </footer>
+  </div>
+
+  <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
+
+  <script>
+    let currentLang = localStorage.getItem('astro4_lang') || 'es';
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('astro4_lang', lang);
+      document.getElementById('privacy-es').style.display = lang === 'es' ? 'block' : 'none';
+      document.getElementById('privacy-en').style.display = lang === 'en' ? 'block' : 'none';
+      document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+      document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+      document.documentElement.lang = lang;
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('astro4_theme', next);
+      document.getElementById('themeBtn').textContent = next === 'dark' ? '☀️' : '🌙';
+    }
+
+    // Init
+    setLang(currentLang);
+    const savedTheme = localStorage.getItem('astro4_theme') || 'light';
+    if (savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.getElementById('themeBtn').textContent = '☀️';
+    }
+  </script>
+</body>
+</html>
