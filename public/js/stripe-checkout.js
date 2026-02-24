@@ -1,5 +1,6 @@
-// stripe-checkout.js - Sistema de consultas ASTRO4
-// 5 consultas gratis + código de donación para 10 más
+// ASTRO4 — stripe-checkout.js v2
+// Real Stripe monetization: pack 10 + premium monthly
+// No more donation codes — all payments through Stripe
 
 // ═══════════════════════════════════════════════════════
 // CONFIGURACIÓN
@@ -8,14 +9,14 @@
 const STRIPE_CONFIG = {
   publishableKey: 'pk_live_51SceBWPG43KliMINorbpT7H9ggnpju2C7OXgvdYdwaCrq5vq12c5AZv7PqDhR4XedTupwhONPhmIaqxi9pvhNljn00cvXoh4zL',
   prices: {
-    pack10: 'price_1SsVusPG43KliMINvkZ9f1Wo',
-    premiumMonthly: 'price_1SsVwKPG43KliMINIuhvF9Fv'
-  },
-  successUrl: window.location.origin + '/app.html?payment=success',
-  cancelUrl: window.location.origin + '/app.html?payment=cancelled'
+    pack10: 'price_1SsVusPG43KliMINvkZ9f1Wo',       // $29 MXN one-time
+    premiumMonthly: 'price_1SsVwKPG43KliMINIuhvF9Fv'  // $49 MXN/month
+  }
 };
 
 const FREE_USES_LIMIT = 5;
+const PACK10_CREDITS = 10;
+const PREMIUM_CREDITS = 999;
 const STORAGE_KEY = 'astro4_usage';
 
 // ═══════════════════════════════════════════════════════
@@ -24,11 +25,18 @@ const STORAGE_KEY = 'astro4_usage';
 
 function getUsageData() {
   const stored = localStorage.getItem(STORAGE_KEY);
-  if (!stored) return { count: 0, donated: false };
+  if (!stored) return { count: 0, product: null, token: null, credits: FREE_USES_LIMIT };
   try {
-    return JSON.parse(stored);
+    const data = JSON.parse(stored);
+    // Migration from old format
+    if (!data.credits && data.credits !== 0) {
+      data.credits = data.donated ? FREE_USES_LIMIT + PACK10_CREDITS : FREE_USES_LIMIT;
+      data.product = data.donated ? 'pack10' : null;
+      delete data.donated;
+    }
+    return data;
   } catch {
-    return { count: 0, donated: false };
+    return { count: 0, product: null, token: null, credits: FREE_USES_LIMIT };
   }
 }
 
@@ -49,103 +57,130 @@ function incrementUsage() {
 
 function hasReachedLimit() {
   const data = getUsageData();
-  if (data.donated) return data.count >= (FREE_USES_LIMIT + 10);
-  return data.count >= FREE_USES_LIMIT;
+  return data.count >= data.credits;
 }
 
 function getRemainingUses() {
   const data = getUsageData();
-  const limit = data.donated ? FREE_USES_LIMIT + 10 : FREE_USES_LIMIT;
-  return Math.max(0, limit - data.count);
+  return Math.max(0, data.credits - data.count);
 }
 
 // ═══════════════════════════════════════════════════════
-// VALIDACIÓN DE CÓDIGO DE DONACIÓN
-// ═══════════════════════════════════════════════════════
-
-function validateDonationCode(code) {
-  const now = new Date();
-  const monthsES = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
-  const monthsEN = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
-  const currentMonth = now.getMonth();
-  const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-  
-  const validCodes = [
-    `ASTRO-${monthsES[currentMonth]}`,
-    `ASTRO-${monthsES[prevMonth]}`,
-    `ASTRO-${monthsEN[currentMonth]}`,
-    `ASTRO-${monthsEN[prevMonth]}`,
-    `MAYA-${monthsES[currentMonth]}`,
-    `MAYA-${monthsES[prevMonth]}`,
-    `MAYA-${monthsEN[currentMonth]}`,
-    `MAYA-${monthsEN[prevMonth]}`,
-    'ASTRO-REGALO',
-    'ASTRO-GIFT',
-    'MAYA-REGALO',
-    'MAYA-GIFT',
-  ];
-  
-  return validCodes.includes(code.trim().toUpperCase());
-}
-
-function applyDonationCode(code) {
-  if (validateDonationCode(code)) {
-    const data = getUsageData();
-    data.donated = true;
-    // Reset count to give fresh 10 uses after the free 5
-    data.count = FREE_USES_LIMIT; 
-    saveUsageData(data);
-    return true;
-  }
-  return false;
-}
-
-// ═══════════════════════════════════════════════════════
-// STRIPE (mantenido por compatibilidad)
+// STRIPE CHECKOUT
 // ═══════════════════════════════════════════════════════
 
 let stripe = null;
 
 function initStripe() {
   if (typeof Stripe === 'undefined') return false;
-  if (STRIPE_CONFIG.publishableKey.includes('REEMPLAZAR')) return false;
   stripe = Stripe(STRIPE_CONFIG.publishableKey);
   return true;
 }
 
+function getReturnUrl(product) {
+  const base = window.location.origin + '/app.html';
+  const params = new URLSearchParams(window.location.search);
+  params.set('payment', 'pending');
+  params.set('product', product);
+  return base + '?' + params.toString();
+}
+
 async function checkoutPack10() {
   if (!stripe && !initStripe()) {
-    showToast('Stripe no disponible', true);
+    showToast(window.currentLang === 'es' ? 'Error cargando pagos' : 'Error loading payments', true);
     return;
   }
   try {
     const { error } = await stripe.redirectToCheckout({
       lineItems: [{ price: STRIPE_CONFIG.prices.pack10, quantity: 1 }],
       mode: 'payment',
-      successUrl: STRIPE_CONFIG.successUrl + '&product=pack10',
-      cancelUrl: STRIPE_CONFIG.cancelUrl
+      successUrl: getReturnUrl('pack10') + '&session_id={CHECKOUT_SESSION_ID}',
+      cancelUrl: getReturnUrl('cancelled')
     });
     if (error) showToast(error.message, true);
   } catch (err) {
-    showToast('Error al procesar', true);
+    showToast(window.currentLang === 'es' ? 'Error al procesar' : 'Processing error', true);
   }
 }
 
 async function checkoutPremium() {
   if (!stripe && !initStripe()) {
-    showToast('Stripe no disponible', true);
+    showToast(window.currentLang === 'es' ? 'Error cargando pagos' : 'Error loading payments', true);
     return;
   }
   try {
     const { error } = await stripe.redirectToCheckout({
       lineItems: [{ price: STRIPE_CONFIG.prices.premiumMonthly, quantity: 1 }],
       mode: 'subscription',
-      successUrl: STRIPE_CONFIG.successUrl + '&product=premium',
-      cancelUrl: STRIPE_CONFIG.cancelUrl
+      successUrl: getReturnUrl('premium') + '&session_id={CHECKOUT_SESSION_ID}',
+      cancelUrl: getReturnUrl('cancelled')
     });
     if (error) showToast(error.message, true);
   } catch (err) {
-    showToast('Error al procesar', true);
+    showToast(window.currentLang === 'es' ? 'Error al procesar' : 'Processing error', true);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// VERIFICACIÓN POST-PAGO
+// ═══════════════════════════════════════════════════════
+
+async function verifyPaymentSession(sessionId) {
+  try {
+    const response = await fetch('/api/verify-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId })
+    });
+
+    const data = await response.json();
+
+    if (data.valid) {
+      const usage = getUsageData();
+      usage.product = data.product;
+      usage.token = data.token;
+      usage.credits = usage.count + data.credits; // Add credits on top of current usage
+      if (data.email) usage.email = data.email;
+      saveUsageData(usage);
+      updateCreditsUI();
+
+      const msg = data.product === 'premium'
+        ? (window.currentLang === 'es' ? '🌟 ¡Premium activado! Consultas ilimitadas.' : '🌟 Premium activated! Unlimited consultations.')
+        : (window.currentLang === 'es' ? '🎉 ¡Gracias! Tienes 10 consultas más.' : '🎉 Thanks! You have 10 more consultations.');
+      showToast(msg);
+      return true;
+    } else {
+      showToast(window.currentLang === 'es' ? 'No se pudo verificar el pago' : 'Could not verify payment', true);
+      return false;
+    }
+  } catch (err) {
+    console.error('ASTRO4: Payment verification error:', err);
+    showToast(window.currentLang === 'es' ? 'Error verificando pago' : 'Payment verification error', true);
+    return false;
+  }
+}
+
+// Check URL for session_id on page load
+function checkPaymentReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get('session_id');
+  const payment = params.get('payment');
+
+  if (sessionId && sessionId.startsWith('cs_')) {
+    // Clean URL without reloading
+    params.delete('session_id');
+    params.delete('payment');
+    params.delete('product');
+    const cleanUrl = window.location.pathname + '?' + params.toString();
+    window.history.replaceState({}, '', cleanUrl);
+
+    // Verify the session
+    verifyPaymentSession(sessionId);
+  } else if (payment === 'cancelled') {
+    params.delete('payment');
+    params.delete('product');
+    const cleanUrl = window.location.pathname + '?' + params.toString();
+    window.history.replaceState({}, '', cleanUrl);
   }
 }
 
@@ -167,16 +202,19 @@ function showToast(message, isError = false) {
 function updateCreditsUI() {
   const badge = document.getElementById('creditsBadge');
   if (!badge) return;
-  
+
   const remaining = getRemainingUses();
   const data = getUsageData();
-  
-  if (remaining > 0) {
-    badge.innerHTML = `🔮 ${remaining} consultas`;
-    badge.className = data.donated ? 'credits-badge pack' : 'credits-badge free';
+
+  if (data.product === 'premium') {
+    badge.innerHTML = '🌟 Premium';
+    badge.className = 'credits-badge premium';
+  } else if (remaining > 0) {
+    badge.innerHTML = '🔮 ' + remaining + (window.currentLang === 'es' ? ' consultas' : ' queries');
+    badge.className = data.product === 'pack10' ? 'credits-badge pack' : 'credits-badge free';
   } else {
-    badge.innerHTML = '💫 Sin consultas';
-    badge.className = 'credits-badge free';
+    badge.innerHTML = '💫 ' + (window.currentLang === 'es' ? 'Sin consultas' : 'No queries left');
+    badge.className = 'credits-badge empty';
   }
   badge.style.display = 'block';
 }
@@ -188,4 +226,6 @@ function updateCreditsUI() {
 document.addEventListener('DOMContentLoaded', () => {
   updateCreditsUI();
   setTimeout(() => initStripe(), 1000);
+  // Check if returning from Stripe
+  setTimeout(() => checkPaymentReturn(), 500);
 });
