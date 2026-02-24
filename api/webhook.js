@@ -21,10 +21,11 @@ function verifyStripeSignature(payload, signature, secret) {
     .update(signedPayload)
     .digest('hex');
 
-  return crypto.timingSafeEqual(
-    Buffer.from(v1Signature),
-    Buffer.from(expectedSignature)
-  );
+  const a = Buffer.from(v1Signature);
+  const b = Buffer.from(expectedSignature);
+  if (a.length !== b.length) return false;
+
+  return crypto.timingSafeEqual(a, b);
 }
 
 export default async function handler(req, res) {
