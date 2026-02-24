@@ -56,16 +56,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ respuesta: 'Servicio temporalmente no disponible.' });
     }
 
-    const systemPrompt = `Eres un guía astrológico y numerológico sabio y empático.
-
-INSTRUCCIONES:
-1. Responde de manera cálida y personalizada basándote en el perfil del usuario
-2. Usa la información astrológica/numerológica proporcionada para dar consejos relevantes
-3. Sé conciso pero significativo
-4. Ofrece perspectivas prácticas y esperanzadoras
-5. No inventes datos que no estén en el perfil
-6. Mantén un tono místico pero accesible
-7. Limita tu respuesta a 3-4 párrafos máximo`;
+    const systemPrompt = `Eres un guía astrológico y numerológico sabio y empático. Sigue las instrucciones del usuario al pie de la letra.`;
     
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -75,7 +66,7 @@ INSTRUCCIONES:
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 500,
         system: systemPrompt,
         messages: [{ role: 'user', content: prompt || 'hola' }]
