@@ -1411,88 +1411,37 @@ function otraConsulta() {
       btn.textContent = t.consulting;
       btn.disabled = true;
       
-      var perfil = {
-        western: western.name + ' (' + western.element + ')',
-        chinese: chinese.animal + ' ' + chinese.element + ' ' + chinese.yinYang,
-        vedic: vedic.nakshatra,
-        lifeNumber: numerology.lifeNumber,
-        lifeMeaning: numerology.lifeMeaning.keyword,
-        personalDay: numerology.personalDay
-      };
-      
-      var nombreUsuario = nombre;
-      var generoUsuario = genero || 'x';
-      var hoy = new Date();
-      var fechaHoy = currentLang === 'es' ? 
-        hoy.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'}) :
-        hoy.toLocaleDateString('en-US', {weekday: 'long', month: 'long', day: 'numeric'});
-      
-      var dayMeanings = {
-        es: {1:'inicio', 2:'cooperación', 3:'expresión', 4:'estructura', 5:'cambio', 6:'armonía', 7:'reflexión', 8:'poder', 9:'cierre'},
-        en: {1:'new beginnings', 2:'cooperation', 3:'expression', 4:'structure', 5:'change', 6:'harmony', 7:'reflection', 8:'power', 9:'completion'}
-      };
-      var dayMeaning = dayMeanings[currentLang][perfil.personalDay] || '';
-      
-      // Calculos V2
+      // v12: Send structured data — prompt built server-side
       var datosNum = calcularDatosNumerologia(birthDate, numerology.lifeNumber);
-      var westernQual = getWesternQualities(western.name, currentLang);
-      var chineseQual = getChineseQualities(chinese.animal, chinese.element, currentLang);
-      var saludoGenero = generoUsuario === 'f' ? (currentLang === 'es' ? 'Querida' : 'Dear') : 
-                         (generoUsuario === 'm' ? (currentLang === 'es' ? 'Querido' : 'Dear') : '');
-      var generoTexto = generoUsuario === 'f' ? (currentLang === 'es' ? 'mujer' : 'woman') :
-                        (generoUsuario === 'm' ? (currentLang === 'es' ? 'hombre' : 'man') : 
-                        (currentLang === 'es' ? 'genero no especificado' : 'gender not specified'));
-      
-      var promptText = currentLang === 'es' ? 
-        'Responde en ESPAÑOL. ' +
-        'USUARIO: ' + nombreUsuario + ' (' + generoTexto + ', ' + datosNum.edad + ' años). ' +
-        'FECHA: ' + fechaHoy + '. ' +
-        '[PERFIL ENERGÉTICO - USA CUALIDADES NO NOMBRES: ' +
-        'Occidental: ' + westernQual + ', ' +
-        'Chino: ' + chineseQual + ', ' +
-        'Nakshatra: ' + perfil.vedic + ', ' +
-        'Número Vida: ' + perfil.lifeNumber + ' (' + perfil.lifeMeaning + '), ' +
-        'Día Personal: ' + perfil.personalDay + ' (' + dayMeaning + '), ' +
-        'Año Personal: ' + datosNum.anoPersonal + ', ' +
-        'Etapa de Vida: ' + datosNum.etapaActual + ' de 4 (inició a los ' + datosNum.edadInicioEtapa + ')] ' +
-        'PREGUNTA: "' + pregunta + '". ' +
-        'INSTRUCCIONES: ' +
-        '1.Inicia con ' + (saludoGenero ? saludoGenero + ' ' + nombreUsuario : nombreUsuario) + '. ' +
-        '2.Responde en 5-7 oraciones sustanciales. ' +
-        '3.NO menciones nombres de signos, animales o nakshatras. SI menciona las CUALIDADES (ej: tu naturaleza intensa, tu energía rápida). ' +
-        '4.Si la pregunta es sobre fechas o etapas, USA LOS NÚMEROS del perfil. ' +
-        '5.Da al menos UN consejo específico y práctico para HOY. ' +
-        '6.Tono: sabio pero directo, no vago ni poético. ' +
-        '7.El usuario debe sentir que le hablas A ÉL/ELLA específicamente, no a un signo. ' +
-        '8.Si la pregunta es incoherente, sin sentido, o no es una pregunta real (ej: letras random, texto sin significado), responde amablemente: "No entendí tu pregunta. ¿Puedes reformularla de forma más clara?" y NO des una lectura.' :
-        'Respond in ENGLISH. ' +
-        'USER: ' + nombreUsuario + ' (' + generoTexto + ', ' + datosNum.edad + ' years old). ' +
-        'DATE: ' + fechaHoy + '. ' +
-        '[ENERGY PROFILE - USE QUALITIES NOT NAMES: ' +
-        'Western: ' + westernQual + ', ' +
-        'Chinese: ' + chineseQual + ', ' +
-        'Nakshatra: ' + perfil.vedic + ', ' +
-        'Life Number: ' + perfil.lifeNumber + ' (' + perfil.lifeMeaning + '), ' +
-        'Personal Day: ' + perfil.personalDay + ' (' + dayMeaning + '), ' +
-        'Personal Year: ' + datosNum.anoPersonal + ', ' +
-        'Life Stage: ' + datosNum.etapaActual + ' of 4 (started at age ' + datosNum.edadInicioEtapa + ')] ' +
-        'QUESTION: "' + pregunta + '". ' +
-        'INSTRUCTIONS: ' +
-        '1.Start with ' + (saludoGenero ? saludoGenero + ' ' + nombreUsuario : nombreUsuario) + '. ' +
-        '2.Respond in 5-7 substantial sentences. ' +
-        '3.DO NOT mention sign names, animals or nakshatras. DO mention QUALITIES (e.g., your intense nature, your quick energy). ' +
-        '4.If the question is about dates or stages, USE THE NUMBERS from the profile. ' +
-        '5.Give at least ONE specific and practical advice for TODAY. ' +
-        '6.Tone: wise but direct, not vague or poetic. ' +
-        '7.The user should feel you are speaking TO THEM specifically, not to a sign. ' +
-        '8.If the question is incoherent, nonsensical, or not a real question (e.g., random letters, meaningless text), respond kindly: "I did not understand your question. Could you rephrase it more clearly?" and DO NOT give a reading.';
+      var payload = {
+        nombre: nombre,
+        genero: genero || 'x',
+        lang: currentLang,
+        pregunta: pregunta,
+        perfil: {
+          westernName: western.name,
+          westernElement: western.element,
+          chineseAnimal: chinese.animal,
+          chineseElement: chinese.element,
+          chineseYinYang: chinese.yinYang,
+          vedic: vedic.nakshatra,
+          lifeNumber: numerology.lifeNumber,
+          lifeMeaning: numerology.lifeMeaning.keyword,
+          personalDay: numerology.personalDay
+        },
+        datosNum: {
+          edad: datosNum.edad,
+          anoPersonal: datosNum.anoPersonal,
+          etapaActual: datosNum.etapaActual,
+          edadInicioEtapa: datosNum.edadInicioEtapa
+        }
+      };
 
-      
       try {
         var response = await fetch('/api/consulta', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: promptText })
+          body: JSON.stringify(payload)
         });
         var data = await response.json();
         currentConsultaId = Date.now();
