@@ -558,7 +558,6 @@
       modalMes.innerHTML = '<option value="">-</option>'; i18n[currentLang].months.forEach((m, idx) => { modalMes.innerHTML += '<option value="' + (idx+1) + '">' + m + '</option>'; });
       modalAnio.innerHTML = '<option value="">-</option>'; for(let i=2010; i>=1920; i--) { modalAnio.innerHTML += '<option value="'+i+'">'+i+'</option>'; }
     }
-    function showPrivacy() { alert(i18n[currentLang].privacyMsg); }
     function initPage() { const diaSelect = document.getElementById('dia'); for(let i=1; i<=31; i++) { diaSelect.innerHTML += '<option value="'+i+'">'+i+'</option>'; } const anioSelect = document.getElementById('anio'); for(let i=2010; i>=1920; i--) { anioSelect.innerHTML += '<option value="'+i+'">'+i+'</option>'; } setLang(currentLang); }
     initPage();
     let deferredPrompt; window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
