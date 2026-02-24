@@ -175,14 +175,16 @@ async function checkPaymentReturn() {
       params.delete('session_id');
       params.delete('payment');
       params.delete('product');
-      const cleanUrl = window.location.pathname + '?' + params.toString();
+      const remaining = params.toString();
+      const cleanUrl = window.location.pathname + (remaining ? '?' + remaining : '');
       window.history.replaceState({}, '', cleanUrl);
     }
     // If failed, session_id stays in URL so reload retries
   } else if (payment === 'cancelled') {
     params.delete('payment');
     params.delete('product');
-    const cleanUrl = window.location.pathname + '?' + params.toString();
+    const remaining = params.toString();
+    const cleanUrl = window.location.pathname + (remaining ? '?' + remaining : '');
     window.history.replaceState({}, '', cleanUrl);
   }
 }
