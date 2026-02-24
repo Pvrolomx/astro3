@@ -1,6 +1,6 @@
-// ASTRO4 — webhook.js v2
-// Stripe webhook: validates signature, logs completed checkouts
-// Products: pack10 (one-time), premium (subscription)
+// ASTRO4 — webhook.js v3
+// Fix: use Web API pattern (request.text()) instead of Node.js streams
+// Vercel serverless functions support Web API natively
 
 import crypto from 'crypto';
 
@@ -27,21 +27,6 @@ function verifyStripeSignature(payload, signature, secret) {
   );
 }
 
-export const config = {
-  api: {
-    bodyParser: false // Need raw body for signature verification
-  }
-};
-
-async function getRawBody(req) {
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-    req.on('data', chunk => chunks.push(chunk));
-    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-    req.on('error', reject);
-  });
-}
-
 export default async function handler(req, res) {
   // Health check
   if (req.method === 'GET') {
@@ -59,7 +44,24 @@ export default async function handler(req, res) {
   }
 
   try {
-    const rawBody = await getRawBody(req);
+    // Read raw body — Vercel provides req.body as parsed JSON by default
+    // We need the raw string for signature verification
+    // If body is already parsed, stringify it back; if string, use as-is
+    let rawBody;
+    if (typeof req.body === 'string') {
+      rawBody = req.body;
+    } else if (req.body && typeof req.body === 'object') {
+      rawBody = JSON.stringify(req.body);
+    } else {
+      // Fallback: read from stream
+      rawBody = await new Promise((resolve, reject) => {
+        const chunks = [];
+        req.on('data', chunk => chunks.push(chunk));
+        req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+        req.on('error', reject);
+      });
+    }
+
     const signature = req.headers['stripe-signature'];
 
     if (!signature) {
@@ -72,7 +74,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid signature' });
     }
 
-    const event = JSON.parse(rawBody);
+    const event = typeof rawBody === 'string' ? JSON.parse(rawBody) : rawBody;
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
@@ -81,7 +83,7 @@ export default async function handler(req, res) {
         customer_email: session.customer_details?.email,
         amount_total: session.amount_total,
         currency: session.currency,
-        mode: session.mode, // 'payment' or 'subscription'
+        mode: session.mode,
         metadata: session.metadata
       });
     }
