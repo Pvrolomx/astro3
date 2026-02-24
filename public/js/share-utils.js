@@ -125,7 +125,7 @@ async function generateShareableImage(data) {
   ctx.fillText('Descubre tu perfil en:', 540, 1800);
   ctx.fillStyle = '#e94560';
   ctx.font = 'bold 26px "Segoe UI", Arial, sans-serif';
-  ctx.fillText('astro3-lovat.vercel.app', 540, 1840);
+  ctx.fillText('astro4.duendes.app', 540, 1840);
   
   // Watermark
   ctx.font = '18px "Segoe UI", Arial, sans-serif';
@@ -227,7 +227,7 @@ function generateShareText(data, maxLength = 500) {
  * Genera URL personalizada con parámetros
  */
 function generateShareUrl(data) {
-  const baseUrl = 'https://astro3-lovat.vercel.app/app.html';
+  const baseUrl = 'https://astro4.duendes.app/app.html';
   const params = new URLSearchParams();
   
   if (data.name) params.set('n', data.name);
