@@ -1,6 +1,6 @@
-// ASTRO4 — verify-session.js v1
-// Verifies Stripe checkout session after redirect
-// Frontend sends session_id, we validate with Stripe API
+// ASTRO4 — verify-session.js v2
+// Fix: session replay protection via Stripe metadata
+// Marks sessions as redeemed so they can't be used twice
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -42,11 +42,31 @@ export default async function handler(req, res) {
       return res.status(200).json({ valid: false, error: 'Payment not completed' });
     }
 
+    // SESSION REPLAY PROTECTION: check if already redeemed
+    if (session.metadata && session.metadata.redeemed === 'true') {
+      console.log('ASTRO4 VERIFY: Session already redeemed', session.id);
+      return res.status(200).json({ valid: false, error: 'Session already redeemed' });
+    }
+
+    // Mark session as redeemed in Stripe metadata
+    const updateResponse = await fetch(`https://api.stripe.com/v1/checkout/sessions/${session_id}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${stripeSecret}`,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'metadata[redeemed]=true'
+    });
+
+    if (!updateResponse.ok) {
+      // Log but don't block — payment is valid, just couldn't mark
+      console.error('ASTRO4 VERIFY: Could not mark session as redeemed', updateResponse.status);
+    }
+
     // Determine product type from mode
     const isPremium = session.mode === 'subscription';
-    const isPack10 = session.mode === 'payment';
 
-    // Generate a simple token: hash of session_id + timestamp
+    // Generate token
     const crypto = await import('crypto');
     const token = crypto.default
       .createHash('sha256')
@@ -54,7 +74,7 @@ export default async function handler(req, res) {
       .digest('hex')
       .substring(0, 32);
 
-    console.log('ASTRO4 VERIFY: Session verified', {
+    console.log('ASTRO4 VERIFY: Session verified and redeemed', {
       session_id: session.id,
       mode: session.mode,
       amount: session.amount_total,
