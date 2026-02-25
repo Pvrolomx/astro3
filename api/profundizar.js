@@ -77,6 +77,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ respuesta: lectura, lectura });
     
   } catch (error) {
-    return res.status(500).json({ respuesta: `Error: ${error.message}`, lectura: 'Error' });
+    console.error('ASTRO4 PROFUNDIZAR: Error:', error.message);
+    return res.status(500).json({ respuesta: 'Algo salió mal. Intenta de nuevo.', lectura: 'Error' });
   }
 }
