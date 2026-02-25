@@ -1290,7 +1290,7 @@
     
     // Upgrade modal functions
     function showUpgradeModal() {
-      document.getElementById('upgradeModal').classList.add('active');
+      document.getElementById('upgradeModal').classList.add('show');
       // Update text based on language
       var t = i18n[currentLang];
       document.querySelectorAll('#upgradeModal [data-i18n]').forEach(function(el) {
@@ -1300,7 +1300,7 @@
     }
     
     function hideUpgradeModal() {
-      document.getElementById('upgradeModal').classList.remove('active');
+      document.getElementById('upgradeModal').classList.remove('show');
     }
     
 function otraConsulta() {
@@ -2013,4 +2013,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
   </script>
 </body>
-</html>/* Vercel Pro test - auto deploy */
+</html>
