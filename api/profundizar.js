@@ -1,4 +1,7 @@
-// API endpoint - v11: Robust body parsing + full functionality
+// API endpoint - v12: Input validation + no error leaking
+
+const MAX_NOMBRE = 50;
+const MAX_SIGN = 50;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -22,9 +25,27 @@ export default async function handler(req, res) {
     // Ignore body parsing errors, use defaults
   }
 
+  // Input validation — prevent oversized payloads
+  if (nombre.length > MAX_NOMBRE) {
+    return res.status(400).json({ respuesta: 'Nombre demasiado largo.', lectura: 'Error' });
+  }
+  if (sig.length > MAX_SIGN) {
+    return res.status(400).json({ respuesta: 'Datos inválidos.', lectura: 'Error' });
+  }
+  // Validate tradition is one of the expected values
+  const validTraditions = ['western', 'vedic', 'chinese', 'numerology'];
+  if (!validTraditions.includes(trad)) {
+    trad = 'western';
+  }
+  // Validate lang
+  if (lang !== 'es' && lang !== 'en') {
+    lang = 'es';
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ respuesta: 'Error: No API key', lectura: 'No API key' });
+    console.error('ASTRO4 PROFUNDIZAR: Missing ANTHROPIC_API_KEY');
+    return res.status(500).json({ respuesta: 'Servicio temporalmente no disponible.', lectura: 'Error' });
   }
 
   // Gender neutral instruction
@@ -68,7 +89,8 @@ export default async function handler(req, res) {
     const text = await response.text();
     
     if (!response.ok) {
-      return res.status(500).json({ respuesta: `Error ${response.status}`, lectura: 'API error' });
+      console.error('ASTRO4 PROFUNDIZAR: API error status:', response.status);
+      return res.status(500).json({ respuesta: 'Error en el servicio. Intenta de nuevo.', lectura: 'Error' });
     }
     
     const data = JSON.parse(text);
