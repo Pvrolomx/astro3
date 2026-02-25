@@ -171,6 +171,32 @@ function buildPrompt(data) {
   }
 }
 
+// ========== INPUT LIMITS ==========
+
+const MAX_NOMBRE = 50;
+const MAX_PREGUNTA = 500;
+const MAX_PROMPT = 2000;
+const MAX_BODY_SIZE = 4096; // bytes
+
+function validateInputLength(body) {
+  // Check raw body size
+  const bodyStr = typeof body === 'string' ? body : JSON.stringify(body);
+  if (bodyStr.length > MAX_BODY_SIZE) {
+    return 'Solicitud demasiado grande.';
+  }
+  // Check individual fields
+  if (body.nombre && body.nombre.length > MAX_NOMBRE) {
+    return 'Nombre demasiado largo.';
+  }
+  if (body.pregunta && body.pregunta.length > MAX_PREGUNTA) {
+    return 'Pregunta demasiado larga (máximo 500 caracteres).';
+  }
+  if (body.prompt && body.prompt.length > MAX_PROMPT) {
+    return 'Solicitud demasiado larga.';
+  }
+  return null;
+}
+
 // ========== HANDLER ==========
 
 export default async function handler(req, res) {
@@ -182,6 +208,12 @@ export default async function handler(req, res) {
     let body = req.body;
     if (typeof body === 'string') {
       body = JSON.parse(body);
+    }
+
+    // Input validation — prevent oversized payloads from burning API tokens
+    const inputError = validateInputLength(body);
+    if (inputError) {
+      return res.status(400).json({ respuesta: inputError });
     }
 
     // Support both OLD format (prompt string) and NEW format (structured data)
@@ -259,4 +291,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ respuesta: 'Algo salió mal. Intenta de nuevo.' });
   }
 }
-// v12 - Refactor Opción B: prompt engineering server-side, backward compatible
+// v13 - Input validation: max length on nombre/pregunta/prompt/body, prevent API token abuse
