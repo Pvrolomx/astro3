@@ -66,6 +66,41 @@ const chineseElements = {
   'Water': { es: 'adaptabilidad y profundidad', en: 'adaptability and depth' }
 };
 
+const nakshatraQualities = {
+  'Ashwini':            { es: 'veloz, sanador, pionero, impaciente por actuar', en: 'swift, healing, pioneering, eager to act' },
+  'Bharani':            { es: 'transformador, intenso, responsable, protector', en: 'transformative, intense, responsible, protective' },
+  'Krittika':           { es: 'cortante, purificador, critico, determinado', en: 'sharp, purifying, critical, determined' },
+  'Rohini':             { es: 'creativo, fertil, sensual, magnetico', en: 'creative, fertile, sensual, magnetic' },
+  'Mrigashira':         { es: 'buscador, curioso, gentil, inquieto', en: 'seeking, curious, gentle, restless' },
+  'Ardra':              { es: 'tormentoso, transformador, intelectual, emocional', en: 'stormy, transformative, intellectual, emotional' },
+  'Punarvasu':          { es: 'renovador, optimista, adaptable, generoso', en: 'renewing, optimistic, adaptable, generous' },
+  'Pushya':             { es: 'nutritivo, prospero, devoto, protector', en: 'nourishing, prosperous, devoted, protective' },
+  'Ashlesha':           { es: 'mistico, intenso, perceptivo, reservado', en: 'mystical, intense, perceptive, reserved' },
+  'Magha':              { es: 'real, ancestral, autoritario, noble', en: 'royal, ancestral, authoritative, noble' },
+  'Purva Phalguni':     { es: 'creativo, placentero, artistico, relajado', en: 'creative, pleasure-seeking, artistic, relaxed' },
+  'Uttara Phalguni':    { es: 'amistoso, confiable, contractual, servicial', en: 'friendly, reliable, contractual, helpful' },
+  'Hasta':              { es: 'habil, artesanal, ingenioso, detallista', en: 'skillful, crafty, ingenious, detail-oriented' },
+  'Chitra':             { es: 'brillante, artistico, visionario, perfeccionista', en: 'brilliant, artistic, visionary, perfectionist' },
+  'Swati':              { es: 'independiente, flexible, diplomatico, libre', en: 'independent, flexible, diplomatic, free' },
+  'Vishakha':           { es: 'determinado, enfocado, ambicioso, persistente', en: 'determined, focused, ambitious, persistent' },
+  'Anuradha':           { es: 'devoto, amistoso, leal, organizador', en: 'devoted, friendly, loyal, organizing' },
+  'Jyeshtha':           { es: 'protector, senior, valiente, responsable', en: 'protective, senior, courageous, responsible' },
+  'Mula':               { es: 'investigador, profundo, destructivo-reconstructivo, filosofico', en: 'investigative, deep, destructive-reconstructive, philosophical' },
+  'Purva Ashadha':      { es: 'invencible, purificador, motivador, optimista', en: 'invincible, purifying, motivating, optimistic' },
+  'Uttara Ashadha':     { es: 'universal, victorioso, lider, inamovible', en: 'universal, victorious, leading, immovable' },
+  'Shravana':           { es: 'aprendiz, buen oyente, conectador, sabio', en: 'learning, good listener, connecting, wise' },
+  'Dhanishta':          { es: 'abundante, musical, ambicioso, social', en: 'abundant, musical, ambitious, social' },
+  'Shatabhisha':        { es: 'sanador, misterioso, independiente, analitico', en: 'healing, mysterious, independent, analytical' },
+  'Purva Bhadrapada':   { es: 'fogoso, transformativo, idealista, extremo', en: 'fiery, transformative, idealistic, extreme' },
+  'Uttara Bhadrapada':  { es: 'profundo, espiritual, sabio, controlado', en: 'deep, spiritual, wise, controlled' },
+  'Revati':             { es: 'nutritivo, viajero, compasivo, sonador', en: 'nurturing, journeying, compassionate, dreamy' }
+};
+
+function getNakshatraQual(nakshatraName, lang) {
+  const q = nakshatraQualities[nakshatraName];
+  return q ? (q[lang] || q.es) : (lang === 'es' ? 'intuitivo, profundo, receptivo' : 'intuitive, deep, receptive');
+}
+
 const dayMeanings = {
   es: {1:'inicio', 2:'cooperación', 3:'expresión', 4:'estructura', 5:'cambio', 6:'armonía', 7:'reflexión', 8:'poder', 9:'cierre'},
   en: {1:'new beginnings', 2:'cooperation', 3:'expression', 4:'structure', 5:'change', 6:'harmony', 7:'reflection', 8:'power', 9:'completion'}
@@ -108,6 +143,7 @@ function buildPrompt(data) {
 
   const westernQual = getWesternQual(perfil.westernName, lang);
   const chineseQual = getChineseQual(perfil.chineseAnimal, perfil.chineseElement, lang);
+  const vedicQual = getNakshatraQual(perfil.vedic, lang);
   const dayMeaning = dayMeanings[lang][perfil.personalDay] || '';
 
   const generoTexto = genero === 'f' ? (lang === 'es' ? 'mujer' : 'woman') :
@@ -131,7 +167,7 @@ function buildPrompt(data) {
       '[PERFIL ENERGÉTICO - USA CUALIDADES NO NOMBRES: ' +
       'Occidental: ' + westernQual + ', ' +
       'Chino: ' + chineseQual + ', ' +
-      'Nakshatra: ' + perfil.vedic + ', ' +
+      'Nakshatra (védico): ' + vedicQual + ', ' +
       'Número Vida: ' + perfil.lifeNumber + ' (' + perfil.lifeMeaning + '), ' +
       'Día Personal: ' + perfil.personalDay + ' (' + dayMeaning + '), ' +
       'Año Personal: ' + datosNum.anoPersonal + ', ' +
@@ -153,7 +189,7 @@ function buildPrompt(data) {
       '[ENERGY PROFILE - USE QUALITIES NOT NAMES: ' +
       'Western: ' + westernQual + ', ' +
       'Chinese: ' + chineseQual + ', ' +
-      'Nakshatra: ' + perfil.vedic + ', ' +
+      'Nakshatra (Vedic): ' + vedicQual + ', ' +
       'Life Number: ' + perfil.lifeNumber + ' (' + perfil.lifeMeaning + '), ' +
       'Personal Day: ' + perfil.personalDay + ' (' + dayMeaning + '), ' +
       'Personal Year: ' + datosNum.anoPersonal + ', ' +
