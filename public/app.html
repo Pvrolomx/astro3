@@ -1056,7 +1056,10 @@
         disclaimerText: "ASTRO4 usa interpretaciones de tradiciones ancestrales: Jyotish védico (Brihat Parashara Hora Shastra), astrología occidental clásica, y numerología tradicional. Esta herramienta es de carácter educativo e interpretativo. No sustituye la consulta con un astrólogo profesional.",
         disclaimerSources: "Fuentes: textos clásicos védicos, tradición helenística, numerología caldea y pitagórica.",
         historyBtn: "📜 Ver Historial de Consultas",
-        historyTitle: "📜 Historial de Consultas"
+        historyTitle: "📜 Historial de Consultas",
+        noHistory: "No tienes consultas guardadas aún.",
+        modeTraditional: "Tradicional",
+        modeComplete: "Completo"
       },
       en: {
         hello: "Hello", yourEnergy: "☀️ Your Energy Today",
@@ -1079,7 +1082,10 @@
         disclaimerText: "ASTRO4 uses interpretations from ancestral traditions: Vedic Jyotish (Brihat Parashara Hora Shastra), classical Western astrology, and traditional numerology. This tool is educational and interpretive in nature. It does not replace consultation with a professional astrologer.",
         disclaimerSources: "Sources: classical Vedic texts, Hellenistic tradition, Chaldean and Pythagorean numerology.",
         historyBtn: "📜 View Consultation History",
-        historyTitle: "📜 Consultation History"
+        historyTitle: "📜 Consultation History",
+        noHistory: "No consultations saved yet.",
+        modeTraditional: "Traditional",
+        modeComplete: "Complete"
       }
     };
     
@@ -1397,7 +1403,9 @@ function otraConsulta() {
         var data = await response.json();
         currentConsultaId = Date.now();
         document.getElementById('respuesta-consulta').style.display = 'block';
-        document.getElementById('respuesta-consulta').innerHTML = '<strong>' + t.guideTitle + '</strong><br><br>' + data.respuesta;
+        // Sanitize API response to prevent XSS
+        var safeRespuesta = data.respuesta.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        document.getElementById('respuesta-consulta').innerHTML = '<strong>' + t.guideTitle + '</strong><br><br>' + safeRespuesta;
         document.getElementById('btn-otra').style.display = 'block';
         document.getElementById('feedbackContainer').classList.add('active');
         document.getElementById('feedbackThanks').classList.remove('active');
@@ -1776,21 +1784,22 @@ function otraConsulta() {
     }
     
     async function showHistory() {
-      const t = translations[currentLang];
+      const t = i18n[currentLang];
       const items = await getHistorial();
       const list = document.getElementById('historyList');
       
       if (items.length === 0) {
         list.innerHTML = '<div class="history-empty">' + t.noHistory + '</div>';
       } else {
+        var esc = function(s) { return s.replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
         list.innerHTML = items.map(item => {
           const fecha = new Date(item.fecha).toLocaleDateString(currentLang === 'es' ? 'es-MX' : 'en-US', { 
             day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' 
           });
           return '<div class="history-item">' +
             '<div class="history-date">' + fecha + '</div>' +
-            '<div class="history-question">' + item.pregunta + '</div>' +
-            '<div class="history-answer">' + item.respuesta.substring(0, 150) + '...</div>' +
+            '<div class="history-question">' + esc(item.pregunta) + '</div>' +
+            '<div class="history-answer">' + esc(item.respuesta.substring(0, 150)) + '...</div>' +
           '</div>';
         }).join('');
       }
@@ -1848,7 +1857,6 @@ function otraConsulta() {
         modeLabel.textContent = i18n[currentLang].modeComplete;
         trackEvent('mode_change', {mode: 'complete'});
       }
-      applyI18n();
     }
 
     function toggleTheme() {
