@@ -1,8 +1,15 @@
-// ASTRO4 — webhook.js v3
-// Fix: use Web API pattern (request.text()) instead of Node.js streams
+// ASTRO4 — webhook.js v4
+// Fix: disable bodyParser + always read raw body for signature verification
 // Vercel serverless functions support Web API natively
 
 import crypto from 'crypto';
+
+// Disable Vercel's automatic body parsing — we need raw bytes for Stripe signature
+export const config = {
+  api: {
+    bodyParser: false
+  }
+};
 
 function verifyStripeSignature(payload, signature, secret) {
   const elements = signature.split(',');
@@ -45,23 +52,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Read raw body — Vercel provides req.body as parsed JSON by default
-    // We need the raw string for signature verification
-    // If body is already parsed, stringify it back; if string, use as-is
+    // Read raw body — bodyParser is disabled so we always read from stream
     let rawBody;
-    if (typeof req.body === 'string') {
-      rawBody = req.body;
-    } else if (req.body && typeof req.body === 'object') {
-      rawBody = JSON.stringify(req.body);
-    } else {
-      // Fallback: read from stream
-      rawBody = await new Promise((resolve, reject) => {
-        const chunks = [];
-        req.on('data', chunk => chunks.push(chunk));
-        req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-        req.on('error', reject);
-      });
-    }
+    rawBody = await new Promise((resolve, reject) => {
+      const chunks = [];
+      req.on('data', chunk => chunks.push(chunk));
+      req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+      req.on('error', reject);
+    });
 
     const signature = req.headers['stripe-signature'];
 
