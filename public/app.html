@@ -443,6 +443,62 @@
     [data-theme="dark"] .warning-content {
       color: #ffb4a9 !important;
     }
+    
+    [data-theme="dark"] .history-content {
+      background: rgba(20, 20, 30, 0.95) !important;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+    
+    [data-theme="dark"] .history-content h3 {
+      color: var(--text-title) !important;
+    }
+    
+    [data-theme="dark"] .history-item {
+      border-color: var(--border);
+    }
+    
+    [data-theme="dark"] .history-date {
+      color: var(--text-muted) !important;
+    }
+    
+    [data-theme="dark"] .history-question {
+      color: var(--text-title) !important;
+    }
+    
+    [data-theme="dark"] .history-answer {
+      color: var(--text-secondary) !important;
+    }
+    
+    [data-theme="dark"] .history-close {
+      background: var(--accent);
+      color: #0a0a0f;
+    }
+    
+    [data-theme="dark"] .history-empty {
+      color: var(--text-muted) !important;
+    }
+    
+    [data-theme="dark"] .share-modal-content {
+      background: rgba(20, 20, 30, 0.95) !important;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+    
+    [data-theme="dark"] .share-modal-content h3 {
+      color: var(--text-title) !important;
+    }
+    
+    [data-theme="dark"] .share-btn.copy {
+      background: var(--bg-input) !important;
+      color: var(--text-primary) !important;
+    }
+    
+    [data-theme="dark"] .share-close {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text-secondary);
+    }
 
     
 /* Badge de créditos */
@@ -477,6 +533,34 @@
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 10px rgba(240, 147, 251, 0.5); }
   50% { box-shadow: 0 0 20px rgba(240, 147, 251, 0.8); }
+}
+
+/* Toast notifications */
+.toast-notification {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(20, 20, 30, 0.95);
+  color: white;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  z-index: 3000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.toast-notification.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
 }
 
 /* Modal de upgrade */
@@ -867,19 +951,19 @@
       <div class="energy-item"><span class="icon">🔢</span><div><div class="label" data-i18n="numerology">Numerología</div><div class="value" id="numerology">...</div></div></div>
     </div>
     
-    <div class="card">
+    <div class="card interpretation-modern">
       <h3 data-i18n="doToday">✅ Haz Esto Hoy</h3>
       <div class="action-item"><span class="action-number">1</span><span class="action-text" id="action-1">...</span></div>
       <div class="action-item"><span class="action-number">2</span><span class="action-text" id="action-2">...</span></div>
       <div class="action-item"><span class="action-number">3</span><span class="action-text" id="action-3">...</span></div>
     </div>
     
-    <div class="card warning-card">
+    <div class="card warning-card interpretation-modern">
       <h3 data-i18n="avoidToday">⚠️ Evita Hoy</h3>
       <div class="warning-content"><span class="warning-icon">⚠️</span><span class="warning-text" id="warning-text">...</span></div>
     </div>
     
-    <div class="card">
+    <div class="card interpretation-modern">
       <div class="extras-grid">
         <div class="extra-item"><span class="icon">🎨</span><div class="label" data-i18n="color">Color</div><div class="value" id="lucky-color">...</div></div>
         <div class="extra-item"><span class="icon">🔢</span><div class="label" data-i18n="number">Número</div><div class="value" id="lucky-number">...</div></div>
@@ -1006,6 +1090,9 @@
     <span id="creditsCount">0</span> consultas
   </div>
 
+  <!-- Toast notifications -->
+  <div id="toast" class="toast-notification"></div>
+
   <!-- Upgrade Modal -->
   <div class="upgrade-modal" id="upgradeModal">
     <div class="upgrade-content">
@@ -1051,6 +1138,7 @@
         limitTitle: "Límite alcanzado", limitDesc: "Has disfrutado 5 consultas gratis. Elige un plan para continuar.", pack10Btn: "10 Consultas — $29 MXN", premiumBtn: "Premium Ilimitado — $49 MXN/mes", maybeLaterBtn: "Quizá luego",
         guideTitle: "🔮 Tu Guía:", errorMsg: "❌ Error. Intenta de nuevo.",
         askFirst: "Escribe una pregunta primero",
+        offlineMsg: "📡 Sin conexión a internet. Conéctate e intenta de nuevo.",
         life: "Vida", of: "de", personalDay: "Día Personal",
         disclaimerTitle: "Aviso importante",
         disclaimerText: "ASTRO4 usa interpretaciones de tradiciones ancestrales: Jyotish védico (Brihat Parashara Hora Shastra), astrología occidental clásica, y numerología tradicional. Esta herramienta es de carácter educativo e interpretativo. No sustituye la consulta con un astrólogo profesional.",
@@ -1077,6 +1165,7 @@
         limitTitle: "Limit reached", limitDesc: "You have enjoyed 5 free consultations. Choose a plan to continue.", pack10Btn: "10 Consultations — $29 MXN", premiumBtn: "Unlimited Premium — $49 MXN/mo", maybeLaterBtn: "Maybe later",
         guideTitle: "🔮 Your Guide:", errorMsg: "❌ Error. Try again.",
         askFirst: "Write a question first",
+        offlineMsg: "📡 No internet connection. Connect and try again.",
         life: "Life", of: "of", personalDay: "Personal Day",
         disclaimerTitle: "Important Notice",
         disclaimerText: "ASTRO4 uses interpretations from ancestral traditions: Vedic Jyotish (Brihat Parashara Hora Shastra), classical Western astrology, and traditional numerology. This tool is educational and interpretive in nature. It does not replace consultation with a professional astrologer.",
@@ -1420,7 +1509,8 @@ function otraConsulta() {
         saveConsulta(pregunta, data.respuesta);
       } catch (error) {
         document.getElementById('respuesta-consulta').style.display = 'block';
-        document.getElementById('respuesta-consulta').innerHTML = t.errorMsg;
+        var msg = (!navigator.onLine && t.offlineMsg) ? t.offlineMsg : t.errorMsg;
+        document.getElementById('respuesta-consulta').innerHTML = msg;
       }
       btn.textContent = t.consultBtn;
       btn.disabled = false;

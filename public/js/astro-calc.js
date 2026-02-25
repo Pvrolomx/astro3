@@ -32,8 +32,8 @@ const westernSigns = {
 
 function getWesternSign(birthDate, lang) {
   lang = lang || 'es';
-  const day = birthDate.getDate();
-  const month = birthDate.getMonth() + 1;
+  const day = birthDate.getUTCDate();
+  const month = birthDate.getUTCMonth() + 1;
   const signs = westernSigns[lang];
   
   for (const sign of signs) {
