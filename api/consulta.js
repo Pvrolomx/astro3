@@ -211,7 +211,6 @@ function buildPrompt(data) {
 
 const MAX_NOMBRE = 50;
 const MAX_PREGUNTA = 500;
-const MAX_PROMPT = 2000;
 const MAX_BODY_SIZE = 4096; // bytes
 
 function validateInputLength(body) {
@@ -226,9 +225,6 @@ function validateInputLength(body) {
   }
   if (body.pregunta && body.pregunta.length > MAX_PREGUNTA) {
     return 'Pregunta demasiado larga (máximo 500 caracteres).';
-  }
-  if (body.prompt && body.prompt.length > MAX_PROMPT) {
-    return 'Solicitud demasiado larga.';
   }
   return null;
 }
