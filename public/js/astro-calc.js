@@ -262,7 +262,7 @@ function getNumerology(birthDate, fullName, lang) {
     s:1, t:2, u:3, v:4, w:5, x:6, y:7, z:8
   };
   const vowels = ['a','e','i','o','u'];
-  const nameLower = (fullName || '').toLowerCase().replace(/[^a-z]/g, '');
+  const nameLower = (fullName || '').toLowerCase().replace(/ñ/g, 'n').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z]/g, '');
   
   let soulSum = 0;
   for (const char of nameLower) {
