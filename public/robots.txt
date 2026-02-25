@@ -1,9 +1,6 @@
-# ASTRO4 - robots.txt
+# astro4.duendes.app
 User-agent: *
 Allow: /
 
-# Sitemap
 Sitemap: https://astro4.duendes.app/sitemap.xml
-
-# Bloquear rutas de API
-Disallow: /api/
+# staging-test-marker
