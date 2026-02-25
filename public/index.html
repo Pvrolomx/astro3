@@ -284,7 +284,7 @@
       <form id="onboarding-form">
         <div class="form-group">
           <label data-i18n="nameLabel">Tu nombre</label>
-          <input type="text" id="nombre" data-i18n-placeholder="namePlaceholder" placeholder="¿Cómo te llamas?" required>
+          <input type="text" id="nombre" data-i18n-placeholder="namePlaceholder" placeholder="¿Cómo te llamas?" required maxlength="50">
         </div>
         <div class="form-group">
           <label data-i18n="genderLabel">Género</label>
@@ -375,7 +375,7 @@
       <div id="modalFormSection">
         <div class="form-group">
           <label id="modalNameLabel">Tu nombre</label>
-          <input type="text" id="modalNombre" placeholder="¿Cómo te llamas?">
+          <input type="text" id="modalNombre" placeholder="¿Cómo te llamas?" maxlength="50">
         </div>
         <div class="form-group">
           <label id="modalBirthLabel">Fecha de nacimiento</label>
@@ -405,7 +405,7 @@
           
           <button class="btn-profundizar" id="btnProfundizar" onclick="profundizarTradicion()">✨ Profundizar</button>
           <div class="profundizar-result" id="profundizarResult">
-            <div class="profundizar-loading" id="profundizarLoading">Consultando tu guía cósmica...</div>
+            <div class="profundizar-loading" id="profundizarLoading" data-i18n="profundizarLoading">Consultando tu guía cósmica...</div>
             <div class="profundizar-text" id="profundizarText"></div>
           </div>
         </div>
@@ -613,6 +613,8 @@
           if (birth.dia) document.getElementById('dia').value = birth.dia;
           if (birth.mes) document.getElementById('mes').value = birth.mes;
           if (birth.anio) document.getElementById('anio').value = birth.anio;
+          if (birth.hora) document.getElementById('hora').value = birth.hora;
+          if (birth.tz) document.getElementById('timezone').value = birth.tz;
         } catch(e) {}
       }
     }
@@ -627,6 +629,8 @@
       document.getElementById('dia').addEventListener('change', saveUserData);
       document.getElementById('mes').addEventListener('change', saveUserData);
       document.getElementById('anio').addEventListener('change', saveUserData);
+      document.getElementById('hora').addEventListener('change', saveUserData);
+      document.getElementById('timezone').addEventListener('change', saveUserData);
     });
 
   </script>

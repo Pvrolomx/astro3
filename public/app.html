@@ -974,7 +974,7 @@
     <div class="card consult-card">
       <h3 data-i18n="consultTitle">💎 Consulta con Tu Guía</h3>
       <p style="font-size:0.85rem;color:#8b7d6b;margin-bottom:12px;" data-i18n="consultSub">¿Dudas sobre amor, carrera o dinero?</p>
-      <textarea id="pregunta" data-i18n-placeholder="consultPlaceholder" placeholder="Escribe tu pregunta..." rows="3"></textarea>
+      <textarea id="pregunta" data-i18n-placeholder="consultPlaceholder" placeholder="Escribe tu pregunta..." rows="3" maxlength="500"></textarea>
       <button class="btn-consult" id="btn-consultar" onclick="enviarConsulta()" data-i18n="consultBtn">✨ Consultar</button>
       <div class="response-box" id="respuesta-consulta"></div>
       <button class="btn-another" id="btn-otra" onclick="otraConsulta()" data-i18n="anotherBtn">🔄 Otra Consulta</button>
@@ -1362,7 +1362,7 @@
       document.getElementById('western-sign').textContent = western.name + ' (' + western.element + ')';
       document.getElementById('chinese-sign').textContent = chinese.animal + ' ' + chinese.element + ' ' + chinese.yinYang;
       document.getElementById('vedic-sign').textContent = vedic.nakshatra;
-      document.getElementById('numerology').textContent = numerology.lifeNumber + ' (' + numerology.lifeMeaning.keyword + ') • Alma ' + numerology.soulNumber;
+      document.getElementById('numerology').textContent = numerology.lifeNumber + ' (' + numerology.lifeMeaning.keyword + ') • ' + (currentLang === 'es' ? 'Alma' : 'Soul') + ' ' + numerology.soulNumber;
       
       document.getElementById('action-1').textContent = result.actions[0];
       document.getElementById('action-2').textContent = result.actions[1];

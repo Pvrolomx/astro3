@@ -252,11 +252,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ respuesta: inputError });
     }
 
-    // Support both OLD format (prompt string) and NEW format (structured data)
     let promptText;
 
     if (body.perfil && body.datosNum) {
-      // NEW FORMAT — structured JSON, build prompt server-side
       const { pregunta } = body;
 
       if (isGibberish(pregunta)) {
@@ -266,15 +264,6 @@ export default async function handler(req, res) {
       }
 
       promptText = buildPrompt(body);
-
-    } else if (body.prompt) {
-      // OLD FORMAT — backward compatible, prompt comes pre-built from frontend
-      if (isGibberish(body.prompt)) {
-        return res.status(200).json({
-          respuesta: '🔮 No entendí tu pregunta. ¿Puedes formularla de manera más clara para que pueda guiarte mejor?'
-        });
-      }
-      promptText = body.prompt;
 
     } else {
       return res.status(400).json({ respuesta: 'Datos incompletos.' });

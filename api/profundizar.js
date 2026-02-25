@@ -1,7 +1,17 @@
-// API endpoint - v12: Input validation + no error leaking
+// API endpoint - v13: Input validation + gibberish check + no error leaking
 
 const MAX_NOMBRE = 50;
 const MAX_SIGN = 50;
+
+function isGibberish(text) {
+  if (!text || typeof text !== 'string') return true;
+  const cleaned = text.trim().toLowerCase();
+  if (cleaned.length < 2) return true;
+  if (!/[a-záéíóúñ]/i.test(cleaned)) return true;
+  if (/(.)\1{3,}/.test(cleaned)) return true;
+  if (/qwert|asdf|zxcv|wasd|hjkl/i.test(cleaned)) return true;
+  return false;
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -23,6 +33,11 @@ export default async function handler(req, res) {
     }
   } catch (e) {
     // Ignore body parsing errors, use defaults
+  }
+
+  // Gibberish check on nombre
+  if (isGibberish(nombre)) {
+    nombre = 'Usuario';
   }
 
   // Input validation — prevent oversized payloads
