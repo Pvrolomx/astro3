@@ -551,12 +551,22 @@
       document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { const key = el.getAttribute('data-i18n-placeholder'); if (i18n[lang][key]) el.placeholder = i18n[lang][key]; });
       updateMonths(); updateModalSelects();
     }
-    function updateMonths() { const mesSelect = document.getElementById('mes'); mesSelect.innerHTML = '<option value="">-</option>'; i18n[currentLang].months.forEach((m, idx) => { mesSelect.innerHTML += '<option value="' + (idx+1) + '">' + m + '</option>'; }); }
+    function updateDays(diaSelect, mes, anio) {
+      var prev = diaSelect.value;
+      var max = 31;
+      if (mes) { max = new Date(parseInt(anio) || 2000, parseInt(mes), 0).getDate(); }
+      diaSelect.innerHTML = '<option value="">-</option>';
+      for (var i = 1; i <= max; i++) { diaSelect.innerHTML += '<option value="'+i+'">'+i+'</option>'; }
+      if (prev && parseInt(prev) <= max) { diaSelect.value = prev; }
+    }
+    function updateMainDays() { updateDays(document.getElementById('dia'), document.getElementById('mes').value, document.getElementById('anio').value); }
+    function updateModalDays() { updateDays(document.getElementById('modalDia'), document.getElementById('modalMes').value, document.getElementById('modalAnio').value); }
+    function updateMonths() { var mesSelect = document.getElementById('mes'); var prev = mesSelect.value; mesSelect.innerHTML = '<option value="">-</option>'; i18n[currentLang].months.forEach((m, idx) => { mesSelect.innerHTML += '<option value="' + (idx+1) + '">' + m + '</option>'; }); if (prev) mesSelect.value = prev; updateMainDays(); }
     function updateModalSelects() {
       const modalDia = document.getElementById('modalDia'), modalMes = document.getElementById('modalMes'), modalAnio = document.getElementById('modalAnio');
-      modalDia.innerHTML = '<option value="">-</option>'; for(let i=1; i<=31; i++) { modalDia.innerHTML += '<option value="'+i+'">'+i+'</option>'; }
       modalMes.innerHTML = '<option value="">-</option>'; i18n[currentLang].months.forEach((m, idx) => { modalMes.innerHTML += '<option value="' + (idx+1) + '">' + m + '</option>'; });
       modalAnio.innerHTML = '<option value="">-</option>'; for(let i=2010; i>=1920; i--) { modalAnio.innerHTML += '<option value="'+i+'">'+i+'</option>'; }
+      updateModalDays();
     }
     function initPage() { const diaSelect = document.getElementById('dia'); for(let i=1; i<=31; i++) { diaSelect.innerHTML += '<option value="'+i+'">'+i+'</option>'; } const anioSelect = document.getElementById('anio'); for(let i=2010; i>=1920; i--) { anioSelect.innerHTML += '<option value="'+i+'">'+i+'</option>'; } setLang(currentLang); }
     initPage();
@@ -622,15 +632,19 @@
     // Guardar al cambiar campos
     document.addEventListener('DOMContentLoaded', function() {
       loadUserData();
+      updateMainDays();
       
       // Event listeners para guardar
       document.getElementById('nombre').addEventListener('change', saveUserData);
       document.getElementById('genero').addEventListener('change', saveUserData);
       document.getElementById('dia').addEventListener('change', saveUserData);
-      document.getElementById('mes').addEventListener('change', saveUserData);
-      document.getElementById('anio').addEventListener('change', saveUserData);
+      document.getElementById('mes').addEventListener('change', function() { updateMainDays(); saveUserData(); });
+      document.getElementById('anio').addEventListener('change', function() { updateMainDays(); saveUserData(); });
       document.getElementById('hora').addEventListener('change', saveUserData);
       document.getElementById('timezone').addEventListener('change', saveUserData);
+      // Modal day validation
+      document.getElementById('modalMes').addEventListener('change', updateModalDays);
+      document.getElementById('modalAnio').addEventListener('change', updateModalDays);
     });
 
   </script>
