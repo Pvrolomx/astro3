@@ -2,7 +2,7 @@
   "name": "ASTRO4 - Tu Guía Cósmica",
   "short_name": "ASTRO4",
   "description": "Tu Guía Cósmica Personal - 4 Tradiciones Astrológicas",
-  "start_url": "/app.html",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
