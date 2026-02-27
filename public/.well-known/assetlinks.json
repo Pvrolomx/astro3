@@ -1,12 +1,8 @@
-[
-  {
-    "relation": ["delegate_permission/common.handle_all_urls"],
-    "target": {
-      "namespace": "android_app",
-      "package_name": "app.duendes.astro4",
-      "sha256_cert_fingerprints": [
-        "PLACEHOLDER:REEMPLAZAR_CON_FINGERPRINT_DE_BUBBLEWRAP"
-      ]
-    }
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.duendes.astro4",
+    "sha256_cert_fingerprints": ["E6:F6:4B:25:C5:B1:85:D5:17:83:7A:68:2B:30:B6:75:03:1A:1B:50:AC:AD:35:80:8B:A4:0D:A5:76:45:B8:EB"]
   }
-]
+}]
