@@ -229,11 +229,68 @@ function validateInputLength(body) {
   return null;
 }
 
+// ========== RATE LIMITING ==========
+// In-memory rate limit — resets when Vercel worker recycles
+// For serious production, use Upstash Redis
+// Limit: 20 requests per IP per hour — generous for real use, blocks abuse
+
+const rateLimitMap = new Map();
+const RATE_LIMIT = 20;           // max requests per window
+const WINDOW_MS = 60 * 60 * 1000; // 1 hour in ms
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const key = ip || 'unknown';
+  const data = rateLimitMap.get(key);
+
+  if (!data || now - data.windowStart > WINDOW_MS) {
+    rateLimitMap.set(key, { count: 1, windowStart: now });
+    return { allowed: true, remaining: RATE_LIMIT - 1 };
+  }
+
+  if (data.count >= RATE_LIMIT) {
+    const retryAfter = Math.ceil((data.windowStart + WINDOW_MS - now) / 1000);
+    return { allowed: false, remaining: 0, retryAfter };
+  }
+
+  data.count++;
+  rateLimitMap.set(key, data);
+  return { allowed: true, remaining: RATE_LIMIT - data.count };
+}
+
+function cleanRateLimitMap() {
+  const now = Date.now();
+  for (const [key, data] of rateLimitMap.entries()) {
+    if (now - data.windowStart > WINDOW_MS) rateLimitMap.delete(key);
+  }
+}
+
 // ========== HANDLER ==========
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Rate limiting — get real IP (Vercel passes x-forwarded-for)
+  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim()
+          || req.socket?.remoteAddress
+          || 'unknown';
+
+  // Occasionally clean old entries
+  if (Math.random() < 0.05) cleanRateLimitMap();
+
+  const rateCheck = checkRateLimit(ip);
+
+  // Always add rate limit headers
+  res.setHeader('X-RateLimit-Limit', RATE_LIMIT);
+  res.setHeader('X-RateLimit-Remaining', rateCheck.remaining);
+
+  if (!rateCheck.allowed) {
+    res.setHeader('Retry-After', rateCheck.retryAfter);
+    return res.status(429).json({
+      respuesta: 'Demasiadas consultas. Por favor espera un momento antes de continuar.'
+    });
   }
 
   try {
@@ -312,4 +369,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ respuesta: 'Algo salió mal. Intenta de nuevo.' });
   }
 }
-// v13 - Input validation: max length on nombre/pregunta/prompt/body, prevent API token abuse
+// v14 - Rate limiting: 20 req/hr per IP to protect API tokens from abuse
