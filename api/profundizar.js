@@ -81,25 +81,30 @@ export default async function handler(req, res) {
     });
   }
 
-  // Parse body con defaults
-  let nombre = 'Usuario';
+  // Parse body — sign es requerido para evitar consumo de API sin datos del usuario
+  let nombre = '';
   let trad   = 'western';
-  let sig    = 'Aries';
+  let sig    = '';
   let lang   = 'es';
 
   try {
     if (req.body && typeof req.body === 'object') {
-      nombre = req.body.nombre   || nombre;
+      nombre = req.body.nombre   || '';
       trad   = req.body.tradition || req.body.tradicion || trad;
-      sig    = req.body.sign     || req.body.signo || sig;
+      sig    = req.body.sign     || req.body.signo || '';
       lang   = req.body.lang     || lang;
     }
   } catch (e) {
     // Ignorar errores de parsing — usar defaults
   }
 
-  // Gibberish check
-  if (isGibberish(nombre)) nombre = 'Usuario';
+  // Validacion de campos requeridos — sin sign no hay lectura (evita abuso de API)
+  if (!sig || sig.trim().length === 0) {
+    return res.status(400).json({ respuesta: 'Datos incompletos.', lectura: 'Error' });
+  }
+
+  // nombre es opcional — usar 'Usuario' como fallback solo si viene vacio
+  if (!nombre || isGibberish(nombre)) nombre = 'Usuario';
 
   // Validacion de longitud
   if (nombre.length > MAX_NOMBRE)
